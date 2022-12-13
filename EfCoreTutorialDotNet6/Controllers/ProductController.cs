@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace EfCoreTutorialDotNet6.Controllers
 {
@@ -11,31 +10,36 @@ namespace EfCoreTutorialDotNet6.Controllers
 
         public ProductController(DataContext context)
         {
-            _context = context;
+            this._context = context;
         }
 
         [HttpGet("{page}")]
-        public async Task<ActionResult<List<Product>>> GetProducts(int page)
+        public async Task<ActionResult<List<Product>>> GetProducts(int page) 
         {
             if (_context.Products == null)
+            {
                 return NotFound();
+            }
 
-            var pageResults = 3f;
-            var pageCount = Math.Ceiling(_context.Products.Count() / pageResults);
+            var pageResult = 3f;
+
+            var PageCount = Math.Ceiling(await _context.Products.CountAsync() / pageResult);
 
             var products = await _context.Products
-                .Skip((page - 1) * (int)pageResults)
-                .Take((int)pageResults)
+                .Skip((page - 1) * (int)pageResult)
+                .Take((int)pageResult)
                 .ToListAsync();
 
-            var response = new ProductResponse
-            {
+            var response = new ProductResponse 
+            { 
                 Products = products,
                 CurrentPage = page,
-                Pages = (int)pageCount
+                Pages = (int)PageCount
             };
 
-            return Ok(response);
+            return Ok(products);
         }
+
+    
     }
 }
